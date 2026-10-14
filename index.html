@@ -4,16 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TLREF Carry Analizi</title>
-<meta name="description" content="New York, Frankfurt, Londra ve Tokyo'dan gecelik borçlanılıp TLREF ile değerlendirilen carry trade pozisyonunun brüt getirisi, günlük, 2019–günümüz.">
+<meta name="description" content="New York, Frankfurt, Londra ve Tokyo'dan gecelik borçlanılıp TLREF ile değerlendirilen carry trade pozisyonunun yıllıklandırılmış brüt getirisi, günlük, 2019–günümüz.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="TLREF carry trade: gecelik fonlama ile brüt getiri">
-<meta property="og:description" content="SOFR, €STR, SONIA ve TONA ile borçlanıp TLREF'e yatırılan carry trade'in günlük brüt getirisi ve para politikası bağlamı, 2019–günümüz.">
+<meta property="og:title" content="TLREF carry trade getirisi">
+<meta property="og:description" content="SOFR, €STR, SONIA ve TONA ile gecelik borçlanıp TLREF'e yatırılan carry trade'in seçilen vadedeki yıllıklandırılmış brüt getirisi, günlük, 2019–günümüz.">
 <meta property="og:locale" content="tr_TR">
-<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=1">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css?v=2">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 <!--PLOTLY-->
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -24,14 +23,12 @@
 
 <header class="masthead">
   <div class="wrap">
-    <h1><span data-lang="tr">TLREF carry trade: gecelik fonlama ile brüt getiri</span><span data-lang="en">TLREF carry trade: gross returns on overnight funding</span></h1>
+    <h1><span data-lang="tr">TLREF carry trade getirisi</span><span data-lang="en">TLREF carry trade returns</span></h1>
     <p class="subtitle">
-      <span data-lang="tr">New York (SOFR), Frankfurt (€STR), Londra (SONIA) ve Tokyo'dan (TONA) gecelik borçlanılıp Türk lirasına çevrilen ve TLREF ile gecelik değerlendirilen pozisyonun brüt getirisi, günlük, 2019–günümüz</span>
-      <span data-lang="en">Gross return on borrowing overnight in New York (SOFR), Frankfurt (€STR), London (SONIA) and Tokyo (TONA), converting into Turkish lira and earning TLREF overnight, daily, 2019–present</span>
+      <span data-lang="tr">New York (SOFR), Frankfurt (€STR), Londra (SONIA) ve Tokyo'dan (TONA) gecelik borçlanılıp TLREF ile değerlendirilen pozisyonun yıllıklandırılmış brüt getirisi, günlük, 2019–günümüz</span>
+      <span data-lang="en">Annualised gross return on borrowing overnight in New York (SOFR), Frankfurt (€STR), London (SONIA) and Tokyo (TONA) and earning TLREF, daily, 2019–present</span>
     </p>
     <p class="meta" id="metaLine">Veri yükleniyor…</p>
-    <p class="meta"><span data-lang="tr">Mevduat faizine dayalı tamamlayıcı çalışma:</span><span data-lang="en">Companion study based on deposit rates:</span>
-      <a href="https://cemkarakutuk.github.io/trcarryreturn/" target="_blank" rel="noopener"><span data-lang="tr">Carry trade getirisi ve TL mevduat faiz politikası</span><span data-lang="en">Carry trade returns and TL deposit rate policy</span></a></p>
     <button type="button" id="langBtn">English</button>
   </div>
 </header>
@@ -39,30 +36,30 @@
 <section class="controls" aria-label="Analiz ayarları">
   <div class="wrap controls-inner">
     <div class="ctl">
-      <span class="ctl-label" id="curLabel"><span data-lang="tr">Fonlama para birimi</span><span data-lang="en">Funding currency</span></span>
-      <div class="tabs" role="tablist" aria-labelledby="curLabel" id="curTabs">
-        <button type="button" role="tab" data-cur="USD" aria-selected="true"><span class="code">USD</span><span class="sub">New York · SOFR</span></button>
-        <button type="button" role="tab" data-cur="EUR" aria-selected="false"><span class="code">EUR</span><span class="sub">Frankfurt · €STR</span></button>
-        <button type="button" role="tab" data-cur="GBP" aria-selected="false"><span class="code">GBP</span><span class="sub"><span data-lang="tr">Londra</span><span data-lang="en">London</span> · SONIA</span></button>
-        <button type="button" role="tab" data-cur="JPY" aria-selected="false"><span class="code">JPY</span><span class="sub">Tokyo · TONA</span></button>
+      <span class="ctl-label" id="curLabel"><span data-lang="tr">Borçlanılan döviz</span><span data-lang="en">Funding currency</span></span>
+      <div class="seg" role="radiogroup" aria-labelledby="curLabel" id="curSeg">
+        <button type="button" role="radio" data-cur="USD" aria-checked="true" title="New York · SOFR">USD</button>
+        <button type="button" role="radio" data-cur="EUR" aria-checked="false" title="Frankfurt · €STR">EUR</button>
+        <button type="button" role="radio" data-cur="GBP" aria-checked="false" title="London · SONIA">GBP</button>
+        <button type="button" role="radio" data-cur="JPY" aria-checked="false" title="Tokyo · TONA">JPY</button>
       </div>
     </div>
     <label class="ctl">
-      <span class="ctl-label"><span data-lang="tr">Ana grafik</span><span data-lang="en">Main chart</span></span>
-      <select id="view">
-        <option value="cum" data-tr="Kümülatif (başlangıçtan bugüne)" data-en="Cumulative (start to date)">Kümülatif (başlangıçtan bugüne)</option>
-        <option value="12" data-tr="12 aylık elde tutma" data-en="12-month holding period">12 aylık elde tutma</option>
-        <option value="6" data-tr="6 aylık elde tutma" data-en="6-month holding period">6 aylık elde tutma</option>
-        <option value="3" data-tr="3 aylık elde tutma" data-en="3-month holding period">3 aylık elde tutma</option>
-        <option value="1" data-tr="1 aylık elde tutma" data-en="1-month holding period">1 aylık elde tutma</option>
-      </select>
+      <span class="ctl-label"><span data-lang="tr">Vade (gün)</span><span data-lang="en">Holding period (days)</span></span>
+      <input id="days" class="days" type="number" min="1" max="2500" step="1" value="365">
     </label>
-    <div class="ctl">
+    <label class="ctl">
+      <span class="ctl-label"><span data-lang="tr">Başlangıç</span><span data-lang="en">From</span></span>
+      <input type="date" id="dFrom">
+    </label>
+    <label class="ctl">
+      <span class="ctl-label"><span data-lang="tr">Bitiş</span><span data-lang="en">To</span></span>
+      <input type="date" id="dTo">
+    </label>
+    <div class="ctl checks">
       <span class="ctl-label"><span data-lang="tr">Gösterim</span><span data-lang="en">Display</span></span>
       <div class="check-row">
         <label><input type="checkbox" id="spread" checked> <span data-lang="tr">Kur makası</span><span data-lang="en">FX spread</span></label>
-        <label><input type="checkbox" id="showCarry"> <span data-lang="tr">Faiz farkı katkısı</span><span data-lang="en">Rate differential</span></label>
-        <label><input type="checkbox" id="showFx"> <span data-lang="tr">Kur etkisi</span><span data-lang="en">FX effect</span></label>
         <label><input type="checkbox" id="showEvents" checked> <span data-lang="tr">Olaylar</span><span data-lang="en">Events</span></label>
       </div>
     </div>
@@ -71,185 +68,70 @@
 
 <main class="wrap">
 
-  <!-- 1 ─ Ana grafik -->
-  <section class="block" id="getiri">
-    <h2><span class="num">1</span><span data-lang="tr">Carry trade brüt getirisi</span><span data-lang="en">Gross carry trade return</span></h2>
-    <div id="mainChart" class="chart chart-main" role="img" aria-label="Carry trade brüt getirisi"></div>
-    <p class="figcap" id="mainCaption"></p>
+  <section class="block" id="bulgu">
+    <h2><span class="num">1</span><span id="chartTitle">Carry trade getirisi</span></h2>
+    <div id="mainChart" class="chart chart-main" role="img" aria-label="Carry trade getirisi"></div>
+    <p class="figcap below" id="mainCaption"></p>
     <p class="chart-note">
-      <span data-lang="tr">Getiri, borçlanılan döviz anaparasına (nominal) oranla verilir; pozisyon özkaynak gerektirmeyen bir finansman işlemidir. Faiz farkı katkısı, kur hiç değişmeseydi elde edilecek getiriyi; kur etkisi, TL bakiyenin dövize dönüşünde kurdan doğan kaybı ya da kazancı gösterir. Bir güne tıklayarak dönem analizini o tarihten başlatabilirsiniz.</span>
-      <span data-lang="en">Returns are expressed relative to the foreign currency principal borrowed (notional); the position is a self-financing trade that requires no equity. The rate differential shows the return had the exchange rate not moved; the FX effect shows the gain or loss from converting the TL balance back. Click a day to start the period analysis from that date.</span>
+      <span data-lang="tr">Her nokta, o gün açılıp seçilen vade sonunda kapatılan pozisyonun yıllıklandırılmış getirisidir. Vade, başlangıç ve bitiş tarihi yukarıdan değiştirilebilir; grafik ve tablo seçime göre yeniden hesaplanır.</span>
+      <span data-lang="en">Each point is the annualised return of a position opened on that day and closed at the end of the chosen holding period. Change the holding period and date range above; the chart and table are recalculated.</span>
+    </p>
+    <p class="intro">
+      <span data-lang="tr">Bu çalışma, düşük faizli bir para biriminde gecelik borçlanıp Türk lirası gecelik referans faizi TLREF ile değerlendirilen carry trade'in 2019'dan bu yana sağladığı brüt getiriyi inceler. Fonlama tarafında dört merkez bankasının gecelik risksiz referans faizleri kullanılır: ABD'de SOFR, euro bölgesinde €STR, Birleşik Krallık'ta SONIA ve Japonya'da TONA. Getiri, borçlanılan döviz cinsinden ve borçlanılan tutara göre hesaplanır.</span>
+      <span data-lang="en">This study examines the gross return since 2019 of borrowing overnight in a low-yielding currency and earning the Turkish lira overnight reference rate, TLREF. The funding legs use the overnight risk-free reference rates of four central banks: SOFR in the United States, €STR in the euro area, SONIA in the United Kingdom and TONA in Japan. The return is measured in the borrowed currency, relative to the amount borrowed.</span>
     </p>
     <div class="stats" id="stats"></div>
     <div class="toolbar">
-      <button type="button" class="btn" id="dlMain"><span data-lang="tr">Grafik verisini indir (CSV)</span><span data-lang="en">Download chart data (CSV)</span></button>
+      <button type="button" class="btn" id="dlMain"><span data-lang="tr">Tablo verisini indir (CSV)</span><span data-lang="en">Download table data (CSV)</span></button>
     </div>
-    <p class="intro">
-      <span data-lang="tr">Bu çalışma, düşük faizli bir para biriminde gecelik borçlanıp Türk lirası gecelik referans faizi TLREF ile değerlendirilen klasik carry trade'in 2019'dan bu yana sağladığı brüt getiriyi inceler. Fonlama tarafında dört büyük merkez bankasının gecelik risksiz referans faizleri kullanılır: ABD'de SOFR, euro bölgesinde €STR, Birleşik Krallık'ta SONIA ve Japonya'da TONA. Getiri, iki ülkenin para politikası arasındaki faiz farkı ile bu farkın kur hareketiyle ne ölçüde telafi edildiğinin birlikte sonucudur. Kurlar TCMB döviz alış ve satış kurlarıdır; giriş alış, çıkış satış kuruyla yapılır.</span>
-      <span data-lang="en">This study examines the gross return since 2019 of the classic carry trade: borrowing overnight in a low-yielding currency and earning the Turkish lira overnight reference rate, TLREF. The funding legs use the overnight risk-free reference rates of four major central banks: SOFR in the United States, €STR in the euro area, SONIA in the United Kingdom and TONA in Japan. The return is the joint outcome of the interest rate differential between the two monetary policies and the extent to which exchange rate moves offset it. Exchange rates are CBRT buying and selling rates; entry uses the buying rate and exit the selling rate.</span>
-    </p>
-  </section>
-
-  <!-- 2 ─ Gecelik getiriler -->
-  <section class="block" id="gecelik">
-    <h2><span class="num">2</span><span data-lang="tr">Gecelik getiriler ve kuyruk riski</span><span data-lang="en">Overnight returns and tail risk</span></h2>
-    <p class="lead">
-      <span data-lang="tr">Her çubuk, bir değerleme gününden ötekine taşınan pozisyonun nominale oranla brüt gecelik getirisidir (orta kur). Carry trade getirileri kalın kuyrukludur: çok sayıda küçük faiz kazancı birkaç sert kur hareketiyle silinir. TL örneğinde KKM'nin açıklanmasının ardından 21 Aralık 2021'de görülen tek günlük sıçrama dağılımı sağa çarpık gösterir; bu gün dışarıda bırakıldığında çarpıklık, carry trade'e özgü negatif değerine döner. Grafiği yakınlaştırdığınızda istatistikler görünen aralığa göre yeniden hesaplanır.</span>
-      <span data-lang="en">Each bar is the gross overnight return, relative to notional, of carrying the position from one valuation day to the next (mid rate). Carry trade returns are fat-tailed: many small interest gains are wiped out by a few sharp currency moves. In the lira's case, the one-day jump on 21 December 2021, after KKM was announced, makes the distribution look right-skewed; excluding that day, skewness returns to the negative value typical of carry trades. Zoom into the chart to recompute the statistics for the visible range.</span>
-    </p>
-    <div id="dailyChart" class="chart chart-mid" role="img" aria-label="Gecelik getiriler"></div>
-    <dl class="kv" id="dailyStats"></dl>
     <details class="rolls" open>
-      <summary><span data-lang="tr">En sert geceler (görünen aralık)</span><span data-lang="en">Most extreme nights (visible range)</span></summary>
-      <div class="scroll"><table id="tailTable"></table></div>
-    </details>
-  </section>
-
-  <!-- 3 ─ Faiz farkı ve para politikası -->
-  <section class="block" id="politika">
-    <h2><span class="num">3</span><span data-lang="tr">Faiz farkı ve para politikası</span><span data-lang="en">Rate differential and monetary policy</span></h2>
-    <p class="lead">
-      <span data-lang="tr">Üst panel TLREF ile seçili fonlama faizi arasındaki farkı, alt panel fonlama faizinin kendisini gösterir. Eksen ölçekleri farklıdır: TLREF yüzde 7,5 ile 53 arasında dalgalanırken fonlama faizleri sıfırın altından yüzde 5,4'e kadar uzanır.</span>
-      <span data-lang="en">The upper panel shows TLREF and its spread over the selected funding rate; the lower panel shows the funding rate itself. The scales differ: TLREF ranges between 7.5 and 53 percent, while funding rates range from below zero to 5.4 percent.</span>
-    </p>
-    <div id="ratesChart" class="chart chart-rates" role="img" aria-label="TLREF ve fonlama faizi"></div>
-    <div class="policy" id="policy"></div>
-  </section>
-
-  <!-- 4 ─ Dönem analizi -->
-  <section class="block" id="donem">
-    <h2><span class="num">4</span><span data-lang="tr">Dönem analizi ve hesap dökümü</span><span data-lang="en">Period analysis and calculation detail</span></h2>
-    <p class="lead">
-      <span data-lang="tr">Pozisyonun açılış ve kapanış tarihini seçin ya da birinci grafikte bir güne tıklayın. Borçlanılan tutar dövizdir; TL bacağı ve borç gecelik faizlerle her gün büyür, kur dönüşümü yalnızca açılışta ve kapanışta yapılır.</span>
-      <span data-lang="en">Choose the opening and closing dates, or click a day on the first chart. The amount borrowed is in foreign currency; the TL leg and the debt grow every day at overnight rates, and currency conversion happens only at opening and closing.</span>
-    </p>
-    <div class="period-controls">
-      <label class="ctl"><span class="ctl-label"><span data-lang="tr">Açılış</span><span data-lang="en">Open</span></span><input type="date" id="pStart"></label>
-      <label class="ctl"><span class="ctl-label"><span data-lang="tr">Kapanış</span><span data-lang="en">Close</span></span><input type="date" id="pEnd"></label>
-      <label class="ctl"><span class="ctl-label" id="amtLabel">Borç (USD)</span><input type="number" id="pAmount" min="1" step="100000" value="1000000"></label>
-      <div class="quick">
-        <button type="button" class="btn ghost" data-quick="12"><span data-lang="tr">1 yıl</span><span data-lang="en">1 year</span></button>
-        <button type="button" class="btn ghost" data-quick="36"><span data-lang="tr">3 yıl</span><span data-lang="en">3 years</span></button>
-        <button type="button" class="btn ghost" data-quick="last12"><span data-lang="tr">Son 12 ay</span><span data-lang="en">Last 12 months</span></button>
-        <button type="button" class="btn ghost" data-quick="all"><span data-lang="tr">Başlangıçtan bugüne</span><span data-lang="en">Start to date</span></button>
-      </div>
-    </div>
-    <div class="cards" id="cards"></div>
-    <div class="calc" id="calc"></div>
-    <details class="rolls" open>
-      <summary><span data-lang="tr">Hesap dökümü: faiz birikimi, borç, kur ve pozisyon değeri</span><span data-lang="en">Calculation detail: interest accrual, debt, exchange rate and position value</span></summary>
-      <div class="toolbar">
-        <label class="ctl"><span class="ctl-label"><span data-lang="tr">Döküm</span><span data-lang="en">Breakdown</span></span>
-          <select id="tableMode">
-            <option value="m" data-tr="Aylık özet" data-en="Monthly summary">Aylık özet</option>
-            <option value="d" data-tr="Günlük (tüm değerleme günleri)" data-en="Daily (all valuation days)">Günlük (tüm değerleme günleri)</option>
-          </select>
-        </label>
-        <button type="button" class="btn" id="dlPeriod"><span data-lang="tr">Günlük dökümü indir (CSV)</span><span data-lang="en">Download daily detail (CSV)</span></button>
-      </div>
+      <summary><span data-lang="tr">Günlük döküm: her açılış gününün verisi ve getirisi</span><span data-lang="en">Daily detail: data and return for each opening day</span></summary>
       <div class="scroll tall"><table id="rollTable"></table></div>
     </details>
   </section>
 
-  <!-- 5 ─ Karşılaştırma -->
-  <section class="block" id="karsilastirma">
-    <h2><span class="num">5</span><span data-lang="tr">Dört fonlama merkezinin karşılaştırması</span><span data-lang="en">Comparing the four funding centres</span></h2>
-    <p class="lead">
-      <span data-lang="tr">Aynı TLREF bacağı dört farklı para biriminde fonlandığında getirilerin ayrışması, fonlama faizinden çok fonlama para biriminin TL karşısındaki seyrinden kaynaklanır. Tablo, her takvim yılını bir önceki yılın son değerleme gününde açılıp yılın son değerleme gününde kapanan pozisyon olarak gösterir.</span>
-      <span data-lang="en">When the same TLREF leg is funded in four different currencies, returns diverge mainly because of how each funding currency moved against the lira, not because of the funding rates. The table treats each calendar year as a position opened on the last valuation day of the previous year and closed on the last valuation day of the year.</span>
-    </p>
-    <div class="toolbar">
-      <label class="ctl"><span class="ctl-label"><span data-lang="tr">Başlangıç</span><span data-lang="en">Start</span></span>
-        <select id="cmpStart">
-          <option value="own" data-tr="Her para biriminin ilk günü" data-en="Each currency's first day">Her para biriminin ilk günü</option>
-          <option value="common" data-tr="Ortak başlangıç (€STR ile, 01.10.2019)" data-en="Common start (with €STR, 1 Oct 2019)">Ortak başlangıç (€STR ile, 01.10.2019)</option>
-          <option value="period" data-tr="Dönem analizindeki tarihler" data-en="Dates from the period analysis">Dönem analizindeki tarihler</option>
-        </select>
-      </label>
-    </div>
-    <div id="cmpChart" class="chart chart-mid" role="img" aria-label="Para birimleri karşılaştırması"></div>
-    <div class="scroll"><table id="yearTable"></table></div>
-    <div class="toolbar">
-      <button type="button" class="btn" id="dlYears"><span data-lang="tr">Yıllık tabloyu indir (CSV)</span><span data-lang="en">Download annual table (CSV)</span></button>
-    </div>
-  </section>
-
-  <!-- 6 ─ Yöntem -->
   <section class="block prose" id="yontem">
-    <h2><span class="num">6</span><span data-lang="tr">Yöntem</span><span data-lang="en">Methodology</span></h2>
+    <h2><span class="num">2</span><span data-lang="tr">Yöntem</span><span data-lang="en">Methodology</span></h2>
     <div class="cols">
       <div>
-        <h3><span data-lang="tr">İşlem</span><span data-lang="en">The trade</span></h3>
-        <p data-lang="tr">Yatırımcı t₀ günü fonlama merkezinde 1 birim döviz borçlanır, dövizi TCMB döviz alış kuru A(t₀) ile bozdurur ve elde ettiği Türk lirasını TLREF ile gecelik değerlendirir. Borç her gece fonlama faiziyle, TL bakiye her gece TLREF ile büyür. Pozisyon t günü kapatılırken TL bakiye döviz satış kuru S(t) ile dövize çevrilir ve birikmiş borç ödenir. Kalan tutar, borçlanılan anaparaya göre brüt getiridir.</p>
-        <p data-lang="en">On day t₀ the investor borrows 1 unit of foreign currency in the funding centre, sells it at the CBRT buying rate A(t₀) and places the lira overnight at TLREF. The debt grows every night at the funding rate and the TL balance at TLREF. When the position is closed on day t, the TL balance is converted back at the selling rate S(t) and the accrued debt is repaid. What remains, relative to the principal borrowed, is the gross return.</p>
-        <div class="formula">R(t) = A(t₀) · [I_TL(t) / I_TL(t₀)] / S(t) − I_F(t) / I_F(t₀)</div>
-        <h3><span data-lang="tr">Gecelik faiz birikim endeksi</span><span data-lang="en">Overnight accrual index</span></h3>
-        <p data-lang="tr">Her referans faiz, yayımlandığı günden bir sonraki yayım gününe kadar geçerlidir. Hafta sonu ve tatillerde son yayımlanan oran takvim günü sayısı kadar işler (SOFR Index ve SONIA Compounded Index ile aynı mantık). Endeks ilk yayım gününde 1'dir:</p>
-        <p data-lang="en">Each reference rate applies from its publication day until the next one. Over weekends and holidays the last published rate accrues for the number of calendar days (the same logic as the SOFR Index and the SONIA Compounded Index). The index equals 1 on the first publication day:</p>
-        <div class="formula">I(dᵢ₊₁) = I(dᵢ) · (1 + rᵢ · (dᵢ₊₁ − dᵢ) / B)
-I(D)    = I(dᵢ) · (1 + rᵢ · (D − dᵢ) / B),   dᵢ ≤ D &lt; dᵢ₊₁</div>
-        <div class="scroll"><table class="compact">
-          <thead><tr><th><span data-lang="tr">Faiz</span><span data-lang="en">Rate</span></th><th><span data-lang="tr">Yöneten</span><span data-lang="en">Administrator</span></th><th><span data-lang="tr">Gün sayımı (B)</span><span data-lang="en">Day count (B)</span></th><th><span data-lang="tr">Başlangıç</span><span data-lang="en">Start</span></th></tr></thead>
-          <tbody>
-            <tr><td>TLREF</td><td>Borsa İstanbul</td><td>ACT/365</td><td>02.01.2019</td></tr>
-            <tr><td>SOFR</td><td>Federal Reserve Bank of New York</td><td>ACT/360</td><td>02.01.2019</td></tr>
-            <tr><td>€STR</td><td><span data-lang="tr">Avrupa Merkez Bankası</span><span data-lang="en">European Central Bank</span></td><td>ACT/360</td><td>01.10.2019</td></tr>
-            <tr><td>SONIA</td><td>Bank of England</td><td>ACT/365</td><td>02.01.2019</td></tr>
-            <tr><td>TONA</td><td>Bank of Japan</td><td>ACT/365</td><td>04.01.2019</td></tr>
-          </tbody>
-        </table></div>
-        <h3><span data-lang="tr">Getirinin ayrıştırılması</span><span data-lang="en">Decomposing the return</span></h3>
-        <p data-lang="tr">G_TL ve G_F sırasıyla TL ve fonlama bacağının birikim çarpanı, M orta kurdur. Üç bileşenin toplamı toplam getiriye tam olarak eşittir:</p>
-        <p data-lang="en">G_TL and G_F are the accrual factors of the TL and funding legs, and M is the mid rate. The three components sum exactly to the total return:</p>
-        <div class="formula">Faiz farkı / Rate differential = G_TL − G_F
-Kur etkisi / FX effect         = G_TL · (M(t₀) / M(t) − 1)
-Makas / Spread cost            = G_TL · (A(t₀) / S(t) − M(t₀) / M(t))</div>
+        <h3><span data-lang="tr">Carry trade getirisi</span><span data-lang="en">Carry trade return</span></h3>
+        <p data-lang="tr">Yatırımcı açılış günü 1 birim döviz borçlanır, dövizi TCMB döviz alış kuruyla bozdurur ve Türk lirasını TLREF ile gecelik değerlendirir. Borç her gece fonlama faiziyle, TL bakiye her gece TLREF ile büyür. Vade sonunda TL bakiye döviz satış kuruyla dövize çevrilir ve birikmiş borç ödenir. Kalan tutarın borçlanılan anaparaya oranı brüt getiridir.</p>
+        <p data-lang="en">On the opening day the investor borrows 1 unit of foreign currency, sells it at the CBRT buying rate and places the lira overnight at TLREF. The debt grows every night at the funding rate and the TL balance at TLREF. At the end of the holding period the TL balance is converted back at the selling rate and the accrued debt is repaid. What remains, relative to the principal borrowed, is the gross return.</p>
+        <div class="formula">R = A(t₀) × [I_TL(t) ÷ I_TL(t₀)] ÷ S(t) − I_F(t) ÷ I_F(t₀)</div>
+        <h3><span data-lang="tr">Gecelik faiz birikimi</span><span data-lang="en">Overnight accrual</span></h3>
+        <p data-lang="tr">Her referans faiz yayımlandığı günden bir sonraki yayım gününe kadar geçerlidir; hafta sonu ve tatillerde son oran takvim günü sayısı kadar işler. I, bu şekilde gecelik bileşiklenen birikim endeksidir. Gün sayımı TLREF, SONIA ve TONA için ACT/365, SOFR ve €STR için ACT/360'tır.</p>
+        <p data-lang="en">Each reference rate applies from its publication day until the next; over weekends and holidays the last rate accrues for the number of calendar days. I is the resulting overnight-compounded accrual index. Day count is ACT/365 for TLREF, SONIA and TONA and ACT/360 for SOFR and €STR.</p>
+        <div class="formula">I(dᵢ₊₁) = I(dᵢ) × (1 + rᵢ × gün ÷ B)</div>
       </div>
       <div>
-        <h3><span data-lang="tr">Gecelik getiri ve istatistikler</span><span data-lang="en">Overnight return and statistics</span></h3>
-        <p data-lang="tr">İkinci bölümdeki gecelik getiri, pozisyonun ardışık iki değerleme günü arasında orta kurla taşınmasının nominale oranla getirisidir. Gecelik getiriler bir fazla getiri (excess return) serisidir; yıllık ortalama 252, yıllık oynaklık √252 ile ölçeklenir. Oran, yıllık ortalamanın yıllık oynaklığa bölümüdür; fonlama maliyeti zaten düşüldüğünden ayrıca risksiz faiz çıkarılmaz.</p>
-        <p data-lang="en">The overnight return in section two is the return, relative to notional, of carrying the position between two consecutive valuation days at the mid rate. Overnight returns form an excess return series; the annual mean is scaled by 252 and annual volatility by √252. The ratio is the annual mean divided by annual volatility; since funding cost is already deducted, no risk-free rate is subtracted again.</p>
-        <div class="formula">r(t) = [I_TL(t) / I_TL(t−1)] · M(t−1) / M(t) − I_F(t) / I_F(t−1)</div>
-        <h3><span data-lang="tr">Kur zamanlaması</span><span data-lang="en">Exchange rate timing</span></h3>
-        <p data-lang="tr">EVDS'de t tarihli TCMB gösterge kuru, bir önceki iş günü saat 15:30'da belirlenen ve t gününde geçerli olan kurdur. Örneğin 22.12.2021 tarihli kur, KKM'nin 20 Aralık akşamı açıklanmasından sonraki 21 Aralık piyasasını yansıtır. Bu nedenle kurlar belirlendikleri güne kaydırılarak aynı günün TLREF'i ve fonlama faiziyle eşleştirildi. Değerleme günleri TCMB'nin kur belirlediği iş günleridir.</p>
-        <p data-lang="en">In EVDS, the CBRT indicative rate dated t is set at 15:30 on the previous business day and is valid on day t. For example, the rate dated 22 December 2021 reflects the 21 December market, after KKM was announced on the evening of 20 December. Exchange rates are therefore shifted back to the day they were set, so they line up with the same day's TLREF and funding rate. Valuation days are the business days on which the CBRT sets exchange rates.</p>
-        <h3><span data-lang="tr">Brüt getiri ve sınırlılıklar</span><span data-lang="en">Gross return and limitations</span></h3>
-        <p data-lang="tr">Getiriler brüttür: vergi, aracı kurum ve banka komisyonu, teminat ve marj maliyeti dahil değildir. İki bacak da referans faizden, kredi marjı olmadan işler; gerçek bir yatırımcı fonlama faizinin üzerinde borçlanır ve TLREF'in altında yatırır. Yabancı yatırımcılar TL'ye çoğunlukla döviz swapları ya da yurt dışı (offshore) piyasa üzerinden erişir; swap ima faizleri, Mart 2019'daki gibi yurt dışı likidite sıkışmalarında TLREF'ten belirgin biçimde ayrılmıştır. Kur makası TCMB alış-satış farkıdır; piyasadaki makas genellikle daha dardır, banka gişe makası daha geniştir.</p>
-        <p data-lang="en">Returns are gross: taxes, brokerage and bank fees, collateral and margin costs are excluded. Both legs run at the reference rate without a credit margin; a real investor borrows above the funding rate and lends below TLREF. Foreign investors mostly access the lira through FX swaps or the offshore market, and implied swap rates diverged markedly from TLREF during offshore liquidity squeezes such as that of March 2019. The FX spread is the CBRT buying-selling spread; interbank spreads are usually narrower and bank counter spreads wider.</p>
-        <h3><span data-lang="tr">Elde tutma pencereleri</span><span data-lang="en">Holding-period windows</span></h3>
-        <p data-lang="tr">Ana grafikte 1, 3, 6 ve 12 aylık görünümlerde her nokta, o gün açılıp seçilen süre sonunda (ilk uygun değerleme gününde) kapatılan pozisyonun yıllıklandırılmamış getirisidir. Yalnızca tamamlanmış dönemler gösterilir.</p>
-        <p data-lang="en">In the 1-, 3-, 6- and 12-month views of the main chart, each point is the non-annualised return of a position opened that day and closed at the end of the chosen period (on the first available valuation day). Only completed periods are shown.</p>
+        <h3><span data-lang="tr">Kur ve makas</span><span data-lang="en">Exchange rate and spread</span></h3>
+        <p data-lang="tr">Kur makası açıkken giriş TCMB döviz alış, çıkış döviz satış kuruyla yapılır; kapalıyken iki uçta da orta kur kullanılır. EVDS'de t tarihli gösterge kur bir önceki iş günü 15:30'da belirlendiğinden, kurlar belirlendikleri güne kaydırılarak aynı günün TLREF'i ile eşleştirildi.</p>
+        <p data-lang="en">With the FX spread enabled, entry uses the CBRT buying rate and exit the selling rate; when disabled, the mid rate is used at both ends. Because the EVDS indicative rate dated t is set at 15:30 on the previous business day, rates were shifted back to the day they were set to match that day's TLREF.</p>
+        <h3><span data-lang="tr">Yıllıklandırma</span><span data-lang="en">Annualisation</span></h3>
+        <p data-lang="tr">Vade sonu, açılıştan seçilen gün sayısı kadar sonraki ilk değerleme günüdür. Yıllık bileşik getiri <em>(1 + R)<sup>365/n</sup> − 1</em> ile hesaplanır (n: gerçekleşen gün sayısı). Kısa vadelerde kur oynaklığı yıllıklandırılmış değeri büyütür.</p>
+        <p data-lang="en">The closing day is the first valuation day at least the chosen number of days after opening. The annualised compound return is <em>(1 + R)<sup>365/n</sup> − 1</em> (n: actual days). Over short holding periods exchange rate volatility inflates the annualised value.</p>
+        <h3><span data-lang="tr">Sınırlılıklar</span><span data-lang="en">Limitations</span></h3>
+        <p data-lang="tr">Getiriler brüttür: vergi, komisyon, teminat ve kredi marjı dahil değildir. İki bacak da referans faizden işler; gerçek bir yatırımcı fonlama faizinin üzerinde borçlanır ve TLREF'in altında yatırır. Yabancı yatırımcılar TL'ye çoğunlukla döviz swapları üzerinden erişir; swap ima faizleri TLREF'ten ayrılabilir.</p>
+        <p data-lang="en">Returns are gross: taxes, fees, collateral and credit margin are excluded. Both legs run at the reference rate; a real investor borrows above the funding rate and lends below TLREF. Foreign investors mostly access the lira through FX swaps, whose implied rates can diverge from TLREF.</p>
       </div>
     </div>
   </section>
 
-  <!-- 7 ─ Veri -->
   <section class="block prose" id="veri">
-    <h2><span class="num">7</span><span data-lang="tr">Veri ve kaynaklar</span><span data-lang="en">Data and sources</span></h2>
-    <p data-lang="tr">TLREF'in yayımı 2019 başında başladığından seri 2 Ocak 2019'dan itibaren kullanılır. Bu nedenle 2002'ye uzanan mevduat bazlı çalışmanın aksine bu çalışma kurumsal piyasanın gerçekte işlem gördüğü gecelik faizle, kısa ama günlük bir dönemi kapsar. €STR'nin yayımı 1 Ekim 2019 işlem gününden, TONA'nın bu veri setindeki ilk gözlemi 4 Ocak 2019'dan başladığı için EUR ve JPY pozisyonları bu tarihlerden açılır. İsviçre frangı (Zürih, SARON) bu sürümde yer almaz; SARON verisi eklendiğinde aynı yöntemle beşinci sekme olarak hesaplanabilir.</p>
-    <p data-lang="en">TLREF publication began at the start of 2019, so the series is used from 2 January 2019. Unlike the deposit-based study that reaches back to 2002, this one covers a shorter but daily period at the overnight rate the institutional market actually trades. €STR publication starts with trade date 1 October 2019 and the first TONA observation in this dataset is 4 January 2019, so EUR and JPY positions open on those dates. The Swiss franc (Zurich, SARON) is not included in this version; once SARON data are added it can be computed as a fifth tab with the same method.</p>
+    <h2><span class="num">3</span><span data-lang="tr">Veri ve kaynaklar</span><span data-lang="en">Data and sources</span></h2>
+    <p data-lang="tr">TLREF'in yayımı 2019 başında başladığından seri 2 Ocak 2019'dan itibaren kullanılır. €STR'nin yayımı 1 Ekim 2019, TONA'nın bu veri setindeki ilk gözlemi 4 Ocak 2019 olduğundan EUR ve JPY pozisyonları bu tarihlerden açılır.</p>
+    <p data-lang="en">TLREF publication began at the start of 2019, so the series is used from 2 January 2019. €STR publication starts on 1 October 2019 and the first TONA observation in this dataset is 4 January 2019, so EUR and JPY positions open from those dates.</p>
     <ul class="sources">
-      <li data-lang="tr"><strong>TLREF:</strong> Borsa İstanbul, Türk lirası gecelik referans faiz oranı, EVDS TP.BISTTLREF.ORAN (günlük).</li>
-      <li data-lang="en"><strong>TLREF:</strong> Borsa İstanbul, Turkish lira overnight reference rate, EVDS TP.BISTTLREF.ORAN (daily).</li>
-      <li data-lang="tr"><strong>Döviz kurları:</strong> TCMB EVDS, USD, EUR, GBP ve JPY döviz alış ve satış kurları, TP.DK.*.A.YTL ve TP.DK.*.S.YTL (günlük; JPY 100 yen başına verilir, 1 yene çevrildi).</li>
-      <li data-lang="en"><strong>Exchange rates:</strong> CBRT EVDS, USD, EUR, GBP and JPY buying and selling rates, TP.DK.*.A.YTL and TP.DK.*.S.YTL (daily; JPY is quoted per 100 yen and converted to 1 yen).</li>
-      <li data-lang="tr"><strong>SOFR:</strong> Federal Reserve Bank of New York, Secured Overnight Financing Rate.</li>
-      <li data-lang="en"><strong>SOFR:</strong> Federal Reserve Bank of New York, Secured Overnight Financing Rate.</li>
-      <li data-lang="tr"><strong>€STR:</strong> Avrupa Merkez Bankası Veri Portalı, euro short-term rate (EST.B.EU000A2X2A25.WT).</li>
-      <li data-lang="en"><strong>€STR:</strong> ECB Data Portal, euro short-term rate (EST.B.EU000A2X2A25.WT).</li>
-      <li data-lang="tr"><strong>SONIA:</strong> Bank of England Database, IUDSOIA.</li>
-      <li data-lang="en"><strong>SONIA:</strong> Bank of England Database, IUDSOIA.</li>
-      <li data-lang="tr"><strong>TONA:</strong> Bank of Japan, teminatsız gecelik çağrı faizi ortalaması, FM01'STRDCLUCON.</li>
-      <li data-lang="en"><strong>TONA:</strong> Bank of Japan, uncollateralised overnight call rate average, FM01'STRDCLUCON.</li>
+      <li data-lang="tr"><strong>TLREF:</strong> Borsa İstanbul, EVDS TP.BISTTLREF.ORAN (günlük).</li>
+      <li data-lang="en"><strong>TLREF:</strong> Borsa İstanbul, EVDS TP.BISTTLREF.ORAN (daily).</li>
+      <li data-lang="tr"><strong>Döviz kurları:</strong> TCMB EVDS, USD, EUR, GBP ve JPY döviz alış ve satış kurları, TP.DK.*.A.YTL ve TP.DK.*.S.YTL (günlük; JPY 100 yen başına verilir).</li>
+      <li data-lang="en"><strong>Exchange rates:</strong> CBRT EVDS, USD, EUR, GBP and JPY buying and selling rates, TP.DK.*.A.YTL and TP.DK.*.S.YTL (daily; JPY quoted per 100 yen).</li>
+      <li data-lang="tr"><strong>SOFR:</strong> Federal Reserve Bank of New York. <strong>€STR:</strong> Avrupa Merkez Bankası. <strong>SONIA:</strong> Bank of England (IUDSOIA). <strong>TONA:</strong> Bank of Japan (FM01'STRDCLUCON).</li>
+      <li data-lang="en"><strong>SOFR:</strong> Federal Reserve Bank of New York. <strong>€STR:</strong> European Central Bank. <strong>SONIA:</strong> Bank of England (IUDSOIA). <strong>TONA:</strong> Bank of Japan (FM01'STRDCLUCON).</li>
     </ul>
     <p class="downloads">
-      <a class="btn" href="data/dataset.csv" download><span data-lang="tr">Birleştirilmiş günlük veri seti (CSV)</span><span data-lang="en">Combined daily dataset (CSV)</span></a>
+      <a class="btn" href="data/dataset.csv" download><span data-lang="tr">Birleştirilmiş veri seti (CSV)</span><span data-lang="en">Combined dataset (CSV)</span></a>
       <a class="btn ghost" href="data/dataset.json" download>JSON</a>
-      <a class="btn ghost" href="data/raw/evds.xlsx" download>EVDS</a>
-      <a class="btn ghost" href="data/raw/sofr.xlsx" download>SOFR</a>
-      <a class="btn ghost" href="data/raw/estr.csv" download>€STR</a>
-      <a class="btn ghost" href="data/raw/sonia.xlsx" download>SONIA</a>
-      <a class="btn ghost" href="data/raw/tona.csv" download>TONA</a>
     </p>
     <p class="meta" id="metaFiles"></p>
   </section>
@@ -264,6 +146,6 @@ Makas / Spread cost            = G_TL · (A(t₀) / S(t) − M(t₀) / M(t))</di
 </footer>
 
 <!--DATA-->
-<script src="assets/js/app.js?v=1"></script>
+<script src="assets/js/app.js?v=2"></script>
 </body>
 </html>

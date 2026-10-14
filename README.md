@@ -8,14 +8,7 @@ Companion to the deposit-based study [Carry trade returns and TL deposit rate po
 
 ## What the site does
 
-| Section | Content |
-| --- | --- |
-| 1 · Gross carry return | Cumulative return since the start date, or 1/3/6/12-month holding-period returns by opening date; optional decomposition into rate differential and FX effect; event markers |
-| 2 · Overnight returns and tail risk | Daily overnight excess returns, mean, volatility, return/volatility ratio, skewness and kurtosis (also excluding the single best night), most extreme nights with context; statistics follow the zoomed range |
-| 3 · Rate differential and monetary policy | TLREF vs the funding rate, plus policy timelines for the Fed, ECB, BoE, BoJ and CBRT |
-| 4 · Period analysis | Any open/close date and notional; step-by-step calculation, monthly or daily breakdown of accrual, debt, FX and position value; daily CSV download |
-| 5 · Comparison | All four funding currencies on one chart and a calendar-year table |
-| 6–7 · Methodology, data | Formulas, day-count conventions, timing, limitations, sources and downloads |
+The visitor chooses the funding currency (USD, EUR, GBP, JPY), a holding period in days and a date range. For every opening day in the range, the site computes the gross return of a position opened that day and closed at the end of the holding period, annualises it, and plots it on a single chart. The table below lists each opening day in detail: TLREF and funding rate that day, entry and exit exchange rates, closing date and day count, average rates over the period, TL return, funding cost, FX change, period return and annualised return. Table data and the combined dataset can be downloaded as CSV.
 
 ## Method
 
@@ -26,7 +19,7 @@ I(d_{i+1}) = I(d_i) · (1 + r_i · (d_{i+1} − d_i) / B)
 R(t)       = A(t0) · [I_TL(t) / I_TL(t0)] / S(t) − I_F(t) / I_F(t0)
 ```
 
-`A` and `S` are CBRT buying and selling rates, `B` is the day-count basis (TLREF, SONIA, TONA ACT/365; SOFR, €STR ACT/360). The return is relative to the foreign currency principal borrowed. It decomposes exactly into rate differential `G_TL − G_F`, FX effect `G_TL · (M(t0)/M(t) − 1)` and spread cost.
+`A` and `S` are CBRT buying and selling rates, `B` is the day-count basis (TLREF, SONIA, TONA ACT/365; SOFR, €STR ACT/360). The return is relative to the foreign currency principal borrowed and is annualised as `(1 + R)^(365/n) − 1`, where `n` is the actual number of days.
 
 **Exchange rate timing.** In EVDS, the CBRT indicative rate dated *t* is set at 15:30 on the previous business day and valid on *t* (the rate dated 22 Dec 2021 reflects the 21 Dec market, after KKM was announced). Rates are shifted back to the day they were set so they line up with that day's TLREF and funding rate.
 
@@ -36,8 +29,8 @@ Returns are **gross**: no taxes, fees, margin or credit spread over the referenc
 
 ```
 index.html                 Site
-assets/css/styles.css      Styling (same theme as trcarryreturn, with dark mode)
-assets/js/app.js           Calculation engine, charts, bilingual UI, policy texts
+assets/css/styles.css      Styling (same theme as trcarryreturn)
+assets/js/app.js           Calculation engine, chart, bilingual UI
 data/dataset.json          Processed dataset the site reads
 data/dataset.csv           Same data as CSV (rates, accrual indices, FX)
 data/events.json           Event markers on the main chart (edit by hand)
