@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TLREF Carry Analizi</title>
-<meta name="description" content="New York, Frankfurt, Londra ve Tokyo'dan gecelik borçlanılıp TLREF ile değerlendirilen carry trade pozisyonunun yıllıklandırılmış brüt getirisi, günlük, 2019–günümüz.">
+<meta name="description" content="New York, Frankfurt, Londra ve Tokyo'dan gecelik borçlanılıp TLREF ile değerlendirilen carry trade pozisyonunun seçilen vadedeki brüt getirisi, günlük, 2019–günümüz.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TLREF carry trade getirisi">
-<meta property="og:description" content="SOFR, €STR, SONIA ve TONA ile gecelik borçlanıp TLREF'e yatırılan carry trade'in seçilen vadedeki yıllıklandırılmış brüt getirisi, günlük, 2019–günümüz.">
+<meta property="og:description" content="SOFR, €STR, SONIA ve TONA ile gecelik borçlanıp TLREF'e yatırılan carry trade'in seçilen vadedeki brüt getirisi, günlük, 2019–günümüz.">
 <meta property="og:locale" content="tr_TR">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=2">
+<link rel="stylesheet" href="assets/css/styles.css?v=3">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 <!--PLOTLY-->
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -25,8 +25,8 @@
   <div class="wrap">
     <h1><span data-lang="tr">TLREF carry trade getirisi</span><span data-lang="en">TLREF carry trade returns</span></h1>
     <p class="subtitle">
-      <span data-lang="tr">New York (SOFR), Frankfurt (€STR), Londra (SONIA) ve Tokyo'dan (TONA) gecelik borçlanılıp TLREF ile değerlendirilen pozisyonun yıllıklandırılmış brüt getirisi, günlük, 2019–günümüz</span>
-      <span data-lang="en">Annualised gross return on borrowing overnight in New York (SOFR), Frankfurt (€STR), London (SONIA) and Tokyo (TONA) and earning TLREF, daily, 2019–present</span>
+      <span data-lang="tr">New York (SOFR), Frankfurt (€STR), Londra (SONIA) ve Tokyo'dan (TONA) gecelik borçlanılıp TLREF ile değerlendirilen pozisyonun seçilen vadedeki brüt getirisi, günlük, 2019–günümüz</span>
+      <span data-lang="en">Gross return over a chosen holding period on borrowing overnight in New York (SOFR), Frankfurt (€STR), London (SONIA) and Tokyo (TONA) and earning TLREF, daily, 2019–present</span>
     </p>
     <p class="meta" id="metaLine">Veri yükleniyor…</p>
     <button type="button" id="langBtn">English</button>
@@ -73,8 +73,8 @@
     <div id="mainChart" class="chart chart-main" role="img" aria-label="Carry trade getirisi"></div>
     <p class="figcap below" id="mainCaption"></p>
     <p class="chart-note">
-      <span data-lang="tr">Her nokta, o gün açılıp seçilen vade sonunda kapatılan pozisyonun yıllıklandırılmış getirisidir. Vade, başlangıç ve bitiş tarihi yukarıdan değiştirilebilir; grafik ve tablo seçime göre yeniden hesaplanır.</span>
-      <span data-lang="en">Each point is the annualised return of a position opened on that day and closed at the end of the chosen holding period. Change the holding period and date range above; the chart and table are recalculated.</span>
+      <span data-lang="tr">Her nokta, o gün açılıp girilen gün sayısı sonunda kapatılan pozisyonun o süredeki getirisidir (yıllıklandırılmamış). Grafik yalnızca tarih ekseninde yakınlaştırılır; dikey eksen görünen aralığa göre ölçeklenir. Çift tıklama tüm döneme döner.</span>
+      <span data-lang="en">Each point is the return of a position opened on that day and closed after the entered number of days, over that period (not annualised). Zooming works on the date axis only; the vertical axis rescales to the visible range. Double-click to return to the full period.</span>
     </p>
     <p class="intro">
       <span data-lang="tr">Bu çalışma, düşük faizli bir para biriminde gecelik borçlanıp Türk lirası gecelik referans faizi TLREF ile değerlendirilen carry trade'in 2019'dan bu yana sağladığı brüt getiriyi inceler. Fonlama tarafında dört merkez bankasının gecelik risksiz referans faizleri kullanılır: ABD'de SOFR, euro bölgesinde €STR, Birleşik Krallık'ta SONIA ve Japonya'da TONA. Getiri, borçlanılan döviz cinsinden ve borçlanılan tutara göre hesaplanır.</span>
@@ -107,9 +107,9 @@
         <h3><span data-lang="tr">Kur ve makas</span><span data-lang="en">Exchange rate and spread</span></h3>
         <p data-lang="tr">Kur makası açıkken giriş TCMB döviz alış, çıkış döviz satış kuruyla yapılır; kapalıyken iki uçta da orta kur kullanılır. EVDS'de t tarihli gösterge kur bir önceki iş günü 15:30'da belirlendiğinden, kurlar belirlendikleri güne kaydırılarak aynı günün TLREF'i ile eşleştirildi.</p>
         <p data-lang="en">With the FX spread enabled, entry uses the CBRT buying rate and exit the selling rate; when disabled, the mid rate is used at both ends. Because the EVDS indicative rate dated t is set at 15:30 on the previous business day, rates were shifted back to the day they were set to match that day's TLREF.</p>
-        <h3><span data-lang="tr">Yıllıklandırma</span><span data-lang="en">Annualisation</span></h3>
-        <p data-lang="tr">Vade sonu, açılıştan seçilen gün sayısı kadar sonraki ilk değerleme günüdür. Yıllık bileşik getiri <em>(1 + R)<sup>365/n</sup> − 1</em> ile hesaplanır (n: gerçekleşen gün sayısı). Kısa vadelerde kur oynaklığı yıllıklandırılmış değeri büyütür.</p>
-        <p data-lang="en">The closing day is the first valuation day at least the chosen number of days after opening. The annualised compound return is <em>(1 + R)<sup>365/n</sup> − 1</em> (n: actual days). Over short holding periods exchange rate volatility inflates the annualised value.</p>
+        <h3><span data-lang="tr">Vade</span><span data-lang="en">Holding period</span></h3>
+        <p data-lang="tr">Vade sonu, açılıştan girilen gün sayısı kadar sonraki ilk değerleme günüdür; hafta sonu ve tatillerde gerçekleşen gün sayısı birkaç gün uzayabilir ve tabloda ayrıca gösterilir. Getiri bu süre için verilir, yıllıklandırılmaz.</p>
+        <p data-lang="en">The closing day is the first valuation day at least the entered number of days after opening; around weekends and holidays the actual day count can be a few days longer and is shown in the table. The return is for that period and is not annualised.</p>
         <h3><span data-lang="tr">Sınırlılıklar</span><span data-lang="en">Limitations</span></h3>
         <p data-lang="tr">Getiriler brüttür: vergi, komisyon, teminat ve kredi marjı dahil değildir. İki bacak da referans faizden işler; gerçek bir yatırımcı fonlama faizinin üzerinde borçlanır ve TLREF'in altında yatırır. Yabancı yatırımcılar TL'ye çoğunlukla döviz swapları üzerinden erişir; swap ima faizleri TLREF'ten ayrılabilir.</p>
         <p data-lang="en">Returns are gross: taxes, fees, collateral and credit margin are excluded. Both legs run at the reference rate; a real investor borrows above the funding rate and lends below TLREF. Foreign investors mostly access the lira through FX swaps, whose implied rates can diverge from TLREF.</p>
@@ -146,6 +146,6 @@
 </footer>
 
 <!--DATA-->
-<script src="assets/js/app.js?v=2"></script>
+<script src="assets/js/app.js?v=3"></script>
 </body>
 </html>

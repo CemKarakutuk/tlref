@@ -1,6 +1,6 @@
 /* TLREF carry trade — hesaplama ve arayüz
  * Veri: data/dataset.json (scripts/update_data.py üretir), data/events.json (elle düzenlenir)
- * Her açılış günü için: seçilen vade sonunda kapatılan pozisyonun getirisi ve yıllıklandırılmış karşılığı.
+ * Her açılış günü için: girilen gün sayısı sonunda kapatılan pozisyonun getirisi (yıllıklandırılmamış).
  */
 (() => {
   "use strict";
@@ -37,7 +37,6 @@
   const cls = (x) => (x == null ? "" : x >= 0 ? "pos" : "neg");
   const dayDiff = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
   const addDays = (s, n) => new Date(Date.parse(s) + n * 864e5).toISOString().slice(0, 10);
-  const annualize = (r, n) => (r == null || n <= 0 || 1 + r <= 0) ? null : Math.pow(1 + r, 365 / n) - 1;
   const esc = (s) => String(s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
   const fxDp = (code) => (code === "JPY" ? 6 : 4);
 
@@ -85,7 +84,7 @@
       const ext = k.spread ? c.sell[j] : c.mid[j];
       const gtl = tl.idx[j] / tl.idx[i], gf = c.idx[j] / c.idx[i];
       const r = ent * gtl / ext - gf;
-      out.push({ i, j, n, date: S.dates[i], exit: S.dates[j], ent, ext, gtl, gf, r, ann: annualize(r, n),
+      out.push({ i, j, n, date: S.dates[i], exit: S.dates[j], ent, ext, gtl, gf, r,
         tlRate: tl.used[i], fRate: c.used[i],
         tlAvg: avgRate(tl.idx, i, j, S.data.meta.tlBasis), fAvg: avgRate(c.idx, i, j, c.basis) });
     }
@@ -102,7 +101,7 @@
     } });
   }
   const plotConfig = () => ({ responsive: true, displaylogo: false, locale: isEN() ? "en" : "tr",
-    modeBarButtonsToRemove: ["lasso2d", "select2d", "autoScale2d"] });
+    modeBarButtonsToRemove: ["lasso2d", "select2d", "autoScale2d", "zoomIn2d", "zoomOut2d"] });
 
   function render() {
     const k = cfg(), c = S.data.cur[k.cur], cur = CUR[k.cur];
@@ -120,19 +119,19 @@
     }
     if ($("mainChart").querySelector(".chart-msg")) $("mainChart").innerHTML = "";
 
-    const x = s.map((p) => p.date), y = s.map((p) => (p.ann == null ? null : p.ann * 100));
-    const custom = s.map((p) => [pct(p.ann), pct(p.r), fdate(p.exit), nf(p.n), rate(p.tlAvg), rate(p.fAvg, 2), pct(p.ext / p.ent - 1)]);
+    const x = s.map((p) => p.date), y = s.map((p) => p.r * 100);
+    const custom = s.map((p) => [pct(p.r, 2), fdate(p.exit), nf(p.n), rate(p.tlAvg), rate(p.fAvg, 2), pct(p.ext / p.ent - 1, 2), pct(p.gtl - 1, 2)]);
     const gain = css("--gain"), loss = css("--loss");
-    const hov = `<b>${L("Yıllıklandırılmış", "Annualised")}: %{customdata[0]}</b><br>` +
-      `${L("Dönem getirisi", "Period return")}: %{customdata[1]} (%{customdata[3]} ${L("gün", "days")})<br>` +
-      `${L("Kapanış", "Close")}: %{customdata[2]}<br>TLREF ${L("ort.", "avg.")}: %{customdata[4]} · ${c.rate} ${L("ort.", "avg.")}: %{customdata[5]}<br>` +
-      `${k.cur}/TRY: %{customdata[6]}<extra></extra>`;
+    const hov = `<b>${L("Carry getirisi", "Carry return")}: %{customdata[0]}</b><br>` +
+      `${L("Kapanış", "Close")}: %{customdata[1]} (%{customdata[2]} ${L("gün", "days")})<br>` +
+      `${L("TL getirisi", "TL return")}: %{customdata[6]} · ${k.cur}/TRY: %{customdata[5]}<br>` +
+      `TLREF ${L("ort.", "avg.")}: %{customdata[3]} · ${c.rate} ${L("ort.", "avg.")}: %{customdata[4]}<extra></extra>`;
     const traces = [
       { x, y: y.map((v) => (v == null ? null : Math.max(v, 0))), type: "scatter", mode: "lines", line: { width: 0 },
         fill: "tozeroy", fillcolor: gain + "59", hoverinfo: "skip", showlegend: false },
       { x, y: y.map((v) => (v == null ? null : Math.min(v, 0))), type: "scatter", mode: "lines", line: { width: 0 },
         fill: "tozeroy", fillcolor: loss + "59", hoverinfo: "skip", showlegend: false },
-      { x, y, name: L(`Carry trade getirisi (${k.cur} borçlanarak, yıllık)`, `Carry trade return (${k.cur}-funded, annualised)`),
+      { x, y, name: L(`Carry trade getirisi (${k.cur} borçlanarak, ${nf(k.days)} gün)`, `Carry trade return (${k.cur}-funded, ${nf(k.days)} days)`),
         type: "scatter", mode: "lines", line: { color: css("--accent"), width: 2 }, customdata: custom, hovertemplate: hov },
     ];
     const ink = css("--ink"), rule = css("--rule");
@@ -140,14 +139,16 @@
     const layout = {
       paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
       font: { family: css("--sans") || "IBM Plex Sans, sans-serif", color: ink, size: 12.5 },
-      margin: { l: 58, r: 18, t: 40, b: 44 }, hovermode: "x unified",
+      margin: { l: 58, r: 18, t: 40, b: 44 }, hovermode: "x unified", dragmode: "zoom",
       hoverlabel: { bgcolor: "#ffffff", bordercolor: rule, font: { color: ink, size: 12.5 } },
       legend: { orientation: "h", x: 0, y: 1.07, font: { color: ink, size: 12.5 } },
       xaxis: { type: "date", showgrid: true, gridcolor: css("--grid"), griddash: "dot", linecolor: css("--ink-2"), tickcolor: rule,
         hoverformat: L("%d.%m.%Y açılış", "Open: %d %b %Y"),
         ...(span > 900 ? { dtick: narrow ? "M24" : "M12", tickformat: "%Y", ticklabelmode: "period" } : { tickformat: "%b %Y" }) },
-      yaxis: { showgrid: true, gridcolor: css("--grid"), griddash: "dot", zerolinecolor: ink, zerolinewidth: 1.2, tickformat: ",.0f",
-        title: { text: L("Yıllıklandırılmış getiri (%)", "Annualised return (%)"), font: { color: css("--muted"), size: 12 } } },
+      // Yakınlaştırma yalnızca tarih ekseninde; y ekseni görünen aralığa göre rescaleY() ile ölçeklenir
+      yaxis: { fixedrange: true, showgrid: true, gridcolor: css("--grid"), griddash: "dot", zerolinecolor: ink, zerolinewidth: 1.2,
+        range: yRange(s, x[0], x[x.length - 1]), autorange: false,
+        title: { text: L(`${nf(k.days)} günlük getiri (%)`, `${nf(k.days)}-day return (%)`), font: { color: css("--muted"), size: 12 } } },
       shapes: [], annotations: [],
     };
     if ($("showEvents").checked) {
@@ -166,15 +167,50 @@
     }
     Plotly.react("mainChart", traces, layout, plotConfig());
     const gd = $("mainChart");
-    if (!gd.__bound) { gd.on("plotly_relayout", updateStats); gd.__bound = true; }
+    if (!gd.__bound) { gd.on("plotly_relayout", onRelayout); gd.__bound = true; }
 
     const sp = k.spread ? L("kur makası dahil (giriş alış, çıkış satış kuru)", "FX spread included (entry at buying, exit at selling rate)")
       : L("kur makası hariç (orta kur)", "FX spread excluded (mid rate)");
     $("mainCaption").textContent = isEN()
-      ? `Figure 1. Annualised gross return of borrowing ${cur.en} overnight at ${c.rate} in ${cur.city} and earning TLREF, held for ${nf(k.days)} days (in ${k.cur}, %); ${sp}. Each point shows the position opened on that day.`
-      : `Şekil 1. ${cur.from} ${c.rate} ile gecelik ${cur.tr} borçlanıp TLREF ile değerlendirilen pozisyonun ${nf(k.days)} günlük vadede yıllıklandırılmış brüt getirisi (${k.cur} bazında, %); ${sp}. Her nokta, o gün açılan pozisyonu gösterir.`;
+      ? `Figure 1. Gross return of borrowing ${cur.en} overnight at ${c.rate} in ${cur.city} and earning TLREF, held for ${nf(k.days)} days (in ${k.cur}, %, not annualised); ${sp}. Each point shows the position opened on that day.`
+      : `Şekil 1. ${cur.from} ${c.rate} ile gecelik ${cur.tr} borçlanıp TLREF ile değerlendirilen pozisyonun ${nf(k.days)} günlük brüt getirisi (${k.cur} bazında, %, yıllıklandırılmamış); ${sp}. Her nokta, o gün açılan pozisyonu gösterir.`;
     updateStats();
     renderTable(k, c);
+  }
+
+  /* Görünen tarih aralığındaki en düşük ve en yüksek getiriye göre y ekseni sınırları */
+  function yRange(s, lo, hi) {
+    let mn = Infinity, mx = -Infinity;
+    for (const p of s) {
+      if (p.date < lo || p.date > hi) continue;
+      const v = p.r * 100;
+      if (v < mn) mn = v;
+      if (v > mx) mx = v;
+    }
+    if (!isFinite(mn)) return [-1, 1];
+    const pad = Math.max((mx - mn) * 0.08, 0.05);
+    return [mn - pad, mx + pad];
+  }
+  function onRelayout(ev) {
+    // Kendi y ekseni güncellemelerimiz de bu olayı tetikler; yalnızca x değişince ölçekle
+    const xKeys = Object.keys(ev || {}).some((key) => key.startsWith("xaxis.range") || key === "xaxis.autorange");
+    if (!xKeys) return;
+    rescaleY();
+    updateStats();
+  }
+  function rescaleY() {
+    const gd = $("mainChart"), s = S.rows;
+    if (!s.length || !gd.layout) return;
+    const xa = gd.layout.xaxis;
+    const full = !xa.range || xa.autorange === true;
+    const lo = full ? s[0].date : String(xa.range[0]).slice(0, 10);
+    const hi = full ? s[s.length - 1].date : String(xa.range[1]).slice(0, 10);
+    // Kısa aralıklarda x ekseni ay etiketlerine geçer
+    const days = dayDiff(lo, hi), narrow = window.innerWidth < 700;
+    const xt = days > (narrow ? 1300 : 900) ? { "xaxis.dtick": narrow ? "M24" : "M12", "xaxis.tickformat": "%Y", "xaxis.ticklabelmode": "period" }
+      : days > (narrow ? 500 : 300) ? { "xaxis.dtick": "M3", "xaxis.tickformat": "%b %Y", "xaxis.ticklabelmode": "instant" }
+      : { "xaxis.dtick": "M1", "xaxis.tickformat": "%b %Y", "xaxis.ticklabelmode": "instant" };
+    Plotly.relayout(gd, Object.assign({ "yaxis.range": yRange(s, lo, hi), "yaxis.autorange": false }, xt));
   }
 
   function describe(vals) {
@@ -199,8 +235,7 @@
     $("stats").innerHTML =
       `<div class="row"><span>${L("Açılış günleri", "Opening days")}: <b>${fdate(inR[0].date)} – ${fdate(inR[inR.length - 1].date)}</b></span>` +
       `<span>${L("Pozisyon sayısı", "Positions")}: <b>${nf(inR.length)}</b></span></div>` +
-      row(L(`Yıllıklandırılmış (${unit})`, `Annualised (${unit})`), describe(inR.map((p) => p.ann))) +
-      row(L("Dönem getirisi", "Period return"), describe(inR.map((p) => p.r)));
+      row(L(`Carry getirisi (${unit}, ${nf(cfg().days)} gün)`, `Carry return (${unit}, ${nf(cfg().days)} days)`), describe(inR.map((p) => p.r)));
   }
 
   function renderTable(k, c) {
@@ -209,13 +244,13 @@
       `<th>${k.spread ? L("Alış", "Buy") : L("Orta kur", "Mid")}</th><th>${L("Kapanış", "Close")}</th><th>${L("Gün", "Days")}</th>` +
       `<th>${k.spread ? L("Satış", "Sell") : L("Orta kur", "Mid")}</th><th>${L("TLREF ort.", "TLREF avg.")}</th><th>${c.rate} ${L("ort.", "avg.")}</th>` +
       `<th>${L("TL getirisi", "TL return")}</th><th>${L("Fonlama maliyeti", "Funding cost")}</th><th>${L("Kur değişimi", "FX change")}</th>` +
-      `<th>${L("Dönem getirisi", "Period return")}</th><th>${L("Yıllıklandırılmış", "Annualised")}</th></tr></thead>`;
+      `<th>${L("Carry getirisi", "Carry return")}</th></tr></thead>`;
     const body = S.rows.map((p) => {
       const fx = p.ext / p.ent - 1;
       return `<tr><td>${fdate(p.date)}</td><td>${rate(p.tlRate)}</td><td>${rate(p.fRate, 3)}</td><td>${nf(p.ent, dp)}</td>` +
         `<td>${fdate(p.exit)}</td><td>${nf(p.n)}</td><td>${nf(p.ext, dp)}</td><td>${rate(p.tlAvg)}</td><td>${rate(p.fAvg, 3)}</td>` +
         `<td>${pct(p.gtl - 1, 2)}</td><td>${pct(p.gf - 1, 3)}</td><td>${pct(fx, 2)}</td>` +
-        `<td class="${cls(p.r)}">${pct(p.r, 2)}</td><td class="${cls(p.ann)}"><b>${pct(p.ann, 2)}</b></td></tr>`;
+        `<td class="${cls(p.r)}"><b>${pct(p.r, 2)}</b></td></tr>`;
     }).join("");
     $("rollTable").innerHTML = head + "<tbody>" + body + "</tbody>";
   }
@@ -225,10 +260,10 @@
     const sep = isEN() ? "," : ";";
     const f = (v, d) => (v == null || !isFinite(v)) ? "" : isEN() ? v.toFixed(d) : v.toFixed(d).replace(".", ",");
     const head = isEN()
-      ? ["Open", "TLREF (%)", `${c.rate} (%)`, `${k.cur}TRY entry`, "Close", "Days", `${k.cur}TRY exit`, "TLREF avg (%)", `${c.rate} avg (%)`, "TL return (%)", "Funding cost (%)", "FX change (%)", "Period return (%)", "Annualised (%)"]
-      : ["Açılış", "TLREF (%)", `${c.rate} (%)`, `${k.cur}TRY giriş`, "Kapanış", "Gün", `${k.cur}TRY çıkış`, "TLREF ort. (%)", `${c.rate} ort. (%)`, "TL getirisi (%)", "Fonlama maliyeti (%)", "Kur değişimi (%)", "Dönem getirisi (%)", "Yıllıklandırılmış (%)"];
+      ? ["Open", "TLREF (%)", `${c.rate} (%)`, `${k.cur}TRY entry`, "Close", "Days", `${k.cur}TRY exit`, "TLREF avg (%)", `${c.rate} avg (%)`, "TL return (%)", "Funding cost (%)", "FX change (%)", "Carry return (%)"]
+      : ["Açılış", "TLREF (%)", `${c.rate} (%)`, `${k.cur}TRY giriş`, "Kapanış", "Gün", `${k.cur}TRY çıkış`, "TLREF ort. (%)", `${c.rate} ort. (%)`, "TL getirisi (%)", "Fonlama maliyeti (%)", "Kur değişimi (%)", "Carry getirisi (%)"];
     const rows = S.rows.map((p) => [p.date, f(p.tlRate, 4), f(p.fRate, 4), f(p.ent, 6), p.exit, p.n, f(p.ext, 6), f(p.tlAvg, 4), f(p.fAvg, 4),
-      f((p.gtl - 1) * 100, 4), f((p.gf - 1) * 100, 4), f((p.ext / p.ent - 1) * 100, 4), f(p.r * 100, 4), f(p.ann == null ? null : p.ann * 100, 4)].join(sep));
+      f((p.gtl - 1) * 100, 4), f((p.gf - 1) * 100, 4), f((p.ext / p.ent - 1) * 100, 4), f(p.r * 100, 4)].join(sep));
     const blob = new Blob(["﻿" + [head.join(sep)].concat(rows).join("\r\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
