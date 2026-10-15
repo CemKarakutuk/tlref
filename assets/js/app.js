@@ -371,7 +371,6 @@
   // ── Dil ve meta ───────────────────────────────────────────────────────
   function applyLanguage() {
     document.documentElement.lang = LANG;
-    document.title = L("TLREF Carry Analizi", "TLREF Carry Analysis");
     const b = $("langBtn");
     b.textContent = isEN() ? "Türkçe" : "English";
     b.setAttribute("aria-label", isEN() ? "Türkçeye geç" : "Switch to English");
