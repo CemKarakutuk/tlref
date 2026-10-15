@@ -9,7 +9,7 @@ Beklenen dosyalar (adın bu kelimeyle başlaması yeterli, .xlsx veya .csv):
   sofr   New York Fed SOFR (Effective Date, Rate (%))
   estr   ECB Data Portal €STR (DATE, değer)
   sonia  Bank of England IUDSOIA (Date, değer)
-  tona   Bank of Japan FM01'STRDCLUCON (tarih, değer; NA = yayım yok)
+  tona   Bank of Japan FM01'STRDCLUCON (işlem tarihi, değer; NA = işlem günü değil)
 
 Kullanım:  python scripts/update_data.py
 """
@@ -110,11 +110,13 @@ def read_tona(p: Path) -> pd.Series:
 def accrual_index(fix: pd.Series, basis: int, at: pd.DatetimeIndex) -> pd.Series:
     """Gecelik faiz birikim endeksi (SOFR Index mantığı).
 
-    Her yayım günü i'de açıklanan r_i, bir sonraki yayım gününe kadar geçerlidir:
+    Seriler yayım tarihine göre değil, oranın ait olduğu işlem tarihine göre dizilidir
+    (SOFR, €STR, SONIA ve TONA ertesi iş günü yayımlanır). i işlem tarihine ait r_i,
+    bir sonraki işlem tarihine kadar geçerlidir:
         I(d_{i+1}) = I(d_i) · (1 + r_i/100 · (d_{i+1} − d_i) / basis)
-    Yayım günleri arasındaki bir D tarihi için:
-        I(D) = I(d_i) · (1 + r_i/100 · (D − d_i) / basis),  d_i = D'den önceki ya da D'ye eşit son yayım.
-    Endeks ilk yayım gününde 1'dir; ilk yayımdan önceki tarihler için boş döner.
+    İşlem tarihleri arasındaki bir D tarihi için:
+        I(D) = I(d_i) · (1 + r_i/100 · (D − d_i) / basis),  d_i = D'den önceki ya da D'ye eşit son işlem tarihi.
+    Endeks ilk işlem tarihinde 1'dir; daha önceki tarihler için boş döner.
     """
     d = fix.index
     lvl = [1.0]
@@ -133,7 +135,7 @@ def accrual_index(fix: pd.Series, basis: int, at: pd.DatetimeIndex) -> pd.Series
 
 
 def last_fix(fix: pd.Series, at: pd.DatetimeIndex) -> pd.Series:
-    """D tarihinde geçerli (D veya öncesindeki son) yayımlanmış oran."""
+    """D tarihinde geçerli oran (D veya öncesindeki son işlem tarihine ait)."""
     return fix.reindex(fix.index.union(at)).ffill().reindex(at).where(at >= fix.index[0])
 
 
@@ -186,7 +188,7 @@ def main() -> None:
     }
     csv = pd.DataFrame(index=days)
     csv.index.name = "date"
-    csv["TLREF_published"] = tl_pub
+    csv["TLREF_fixing"] = tl_pub
     csv["TLREF_effective"] = tl_used
     csv["TLREF_index"] = tl_idx
 
@@ -195,7 +197,7 @@ def main() -> None:
         idx = accrual_index(fx, f["basis"], days)
         used = last_fix(fx, days)
         pub = fx.reindex(days)
-        # Başlangıç: hem TLREF hem fonlama faizinin yayımlandığı ilk değerleme günü
+        # Başlangıç: hem TLREF hem fonlama faizinin bulunduğu ilk işlem tarihi
         start = days[days >= max(fx.index[0], fixes["TLREF"].index[0])][0]
         js["cur"][c] = {
             **f,
@@ -209,7 +211,7 @@ def main() -> None:
         r = f["rate"].replace("€", "E")
         csv[f"{c}TRY_buy"] = ev.loc[days, f"{c}_A"]
         csv[f"{c}TRY_sell"] = ev.loc[days, f"{c}_S"]
-        csv[f"{r}_published"] = pub
+        csv[f"{r}_fixing"] = pub
         csv[f"{r}_effective"] = used
         csv[f"{r}_index"] = idx
 
@@ -217,7 +219,7 @@ def main() -> None:
     csv.to_csv(OUT_CSV, float_format="%.10g")
     print(f"{len(days)} değerleme günü: {days[0].date()} → {days[-1].date()}")
     for k, s in fixes.items():
-        print(f"  {k:6s} {len(s):5d} yayım, {s.index[0].date()} → {s.index[-1].date()}, son {s.iloc[-1]}")
+        print(f"  {k:6s} {len(s):5d} işlem günü, {s.index[0].date()} → {s.index[-1].date()}, son {s.iloc[-1]}")
     for c in FUNDING:
         print(f"  {c} başlangıç: {js['cur'][c]['start']}")
 
