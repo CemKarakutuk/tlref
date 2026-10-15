@@ -8,7 +8,9 @@ Companion to the deposit-based study [Carry trade returns and TL deposit rate po
 
 ## What the site does
 
-The visitor chooses the funding currency (USD, EUR, GBP, JPY), a holding period in days and a date range. For every opening day in the range, the site computes the gross return of a position opened that day and closed after the chosen number of days (not annualised) and plots it on a single chart. Zooming works on the date axis only and the vertical axis rescales to the visible range. The table below lists each opening day in detail: TLREF and funding rate that day, entry and exit exchange rates, closing date and day count, average rates over the period, TL return, funding cost, FX change and carry return. Table data and the combined dataset can be downloaded as CSV.
+The visitor chooses the funding currency (USD, EUR, GBP, JPY) and a holding period in days. The chart shows, for every opening day since 2019, the gross return of a position opened that day and closed after that many days (not annualised; the annualised figure appears on hover). Zooming works on the date axis only and the vertical axis rescales to the visible range. The FX change over the same period and event markers can be switched on and off.
+
+Below the chart, the calculation section takes an opening date (typed, or picked by clicking the chart), a number of days and an amount, and lists the position on every valuation day: TLREF and funding rate, buying and selling rates, TL balance, value if converted, debt, profit/loss and return. Chart data, the calculation detail and the combined dataset can be downloaded as CSV.
 
 ## Method
 

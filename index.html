@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css?v=3">
+<link rel="stylesheet" href="assets/css/styles.css?v=4">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
 <!--PLOTLY-->
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -48,18 +48,11 @@
       <span class="ctl-label"><span data-lang="tr">Vade (gün)</span><span data-lang="en">Holding period (days)</span></span>
       <input id="days" class="days" type="number" min="1" max="2500" step="1" value="365">
     </label>
-    <label class="ctl">
-      <span class="ctl-label"><span data-lang="tr">Başlangıç</span><span data-lang="en">From</span></span>
-      <input type="date" id="dFrom">
-    </label>
-    <label class="ctl">
-      <span class="ctl-label"><span data-lang="tr">Bitiş</span><span data-lang="en">To</span></span>
-      <input type="date" id="dTo">
-    </label>
     <div class="ctl checks">
       <span class="ctl-label"><span data-lang="tr">Gösterim</span><span data-lang="en">Display</span></span>
       <div class="check-row">
         <label><input type="checkbox" id="spread" checked> <span data-lang="tr">Kur makası</span><span data-lang="en">FX spread</span></label>
+        <label><input type="checkbox" id="showFx"> <span data-lang="tr">Kur değişimi</span><span data-lang="en">FX change</span></label>
         <label><input type="checkbox" id="showEvents" checked> <span data-lang="tr">Olaylar</span><span data-lang="en">Events</span></label>
       </div>
     </div>
@@ -73,8 +66,8 @@
     <div id="mainChart" class="chart chart-main" role="img" aria-label="Carry trade getirisi"></div>
     <p class="figcap below" id="mainCaption"></p>
     <p class="chart-note">
-      <span data-lang="tr">Her nokta, o gün açılıp girilen gün sayısı sonunda kapatılan pozisyonun o süredeki getirisidir (yıllıklandırılmamış). Grafik yalnızca tarih ekseninde yakınlaştırılır; dikey eksen görünen aralığa göre ölçeklenir. Çift tıklama tüm döneme döner.</span>
-      <span data-lang="en">Each point is the return of a position opened on that day and closed after the entered number of days, over that period (not annualised). Zooming works on the date axis only; the vertical axis rescales to the visible range. Double-click to return to the full period.</span>
+      <span data-lang="tr">Her nokta, o gün açılıp girilen gün sayısı sonunda kapatılan pozisyonun o süredeki getirisidir (yıllıklandırılmamış). Grafik yalnızca tarih ekseninde yakınlaştırılır; dikey eksen görünen aralığa göre ölçeklenir. Bir güne tıklayarak aşağıdaki hesaplamayı o tarihten başlatabilirsiniz. Çift tıklama tüm döneme döner.</span>
+      <span data-lang="en">Each point is the return of a position opened on that day and closed after the entered number of days, over that period (not annualised). Zooming works on the date axis only; the vertical axis rescales to the visible range. Click a day to start the calculation below from that date. Double-click to return to the full period.</span>
     </p>
     <p class="intro">
       <span data-lang="tr">Bu çalışma, düşük faizli bir para biriminde gecelik borçlanıp Türk lirası gecelik referans faizi TLREF ile değerlendirilen carry trade'in 2019'dan bu yana sağladığı brüt getiriyi inceler. Fonlama tarafında dört merkez bankasının gecelik risksiz referans faizleri kullanılır: ABD'de SOFR, euro bölgesinde €STR, Birleşik Krallık'ta SONIA ve Japonya'da TONA. Getiri, borçlanılan döviz cinsinden ve borçlanılan tutara göre hesaplanır.</span>
@@ -82,16 +75,34 @@
     </p>
     <div class="stats" id="stats"></div>
     <div class="toolbar">
-      <button type="button" class="btn" id="dlMain"><span data-lang="tr">Tablo verisini indir (CSV)</span><span data-lang="en">Download table data (CSV)</span></button>
+      <button type="button" class="btn" id="dlMain"><span data-lang="tr">Grafik verisini indir (CSV)</span><span data-lang="en">Download chart data (CSV)</span></button>
     </div>
+  </section>
+
+  <section class="block" id="hesap">
+    <h2><span class="num">2</span><span data-lang="tr">Hesaplama</span><span data-lang="en">Calculation</span></h2>
+    <p class="lead">
+      <span data-lang="tr">Açılış tarihini seçin ya da grafikte bir güne tıklayın, gün sayısını yazın. Pozisyonun her değerleme günündeki TL bakiyesi, borcu, kuru ve değeri aşağıda hesaplanır.</span>
+      <span data-lang="en">Choose an opening date or click a day on the chart, then enter the number of days. The position's TL balance, debt, exchange rate and value on every valuation day are calculated below.</span>
+    </p>
+    <div class="period-controls">
+      <label class="ctl"><span class="ctl-label"><span data-lang="tr">Açılış tarihi</span><span data-lang="en">Opening date</span></span><input type="date" id="cStart"></label>
+      <label class="ctl"><span class="ctl-label"><span data-lang="tr">Gün sayısı</span><span data-lang="en">Number of days</span></span><input type="number" class="days" id="cDays" min="1" max="2900" step="1" value="365"></label>
+      <label class="ctl"><span class="ctl-label" id="amtLabel">Tutar (USD)</span><input type="number" id="cAmount" min="1" step="1000" value="100000"></label>
+    </div>
+    <div class="cards" id="cards"></div>
+    <p class="chart-note" id="calcNote"></p>
     <details class="rolls" open>
-      <summary><span data-lang="tr">Günlük döküm: her açılış gününün verisi ve getirisi</span><span data-lang="en">Daily detail: data and return for each opening day</span></summary>
+      <summary><span data-lang="tr">Hesap dökümü: her değerleme gününde faiz, borç, kur ve pozisyon değeri</span><span data-lang="en">Calculation detail: interest, debt, exchange rate and position value on each valuation day</span></summary>
+      <div class="toolbar">
+        <button type="button" class="btn" id="dlCalc"><span data-lang="tr">Hesap dökümünü indir (CSV)</span><span data-lang="en">Download calculation detail (CSV)</span></button>
+      </div>
       <div class="scroll tall"><table id="rollTable"></table></div>
     </details>
   </section>
 
   <section class="block prose" id="yontem">
-    <h2><span class="num">2</span><span data-lang="tr">Yöntem</span><span data-lang="en">Methodology</span></h2>
+    <h2><span class="num">3</span><span data-lang="tr">Yöntem</span><span data-lang="en">Methodology</span></h2>
     <div class="cols">
       <div>
         <h3><span data-lang="tr">Carry trade getirisi</span><span data-lang="en">Carry trade return</span></h3>
@@ -118,7 +129,7 @@
   </section>
 
   <section class="block prose" id="veri">
-    <h2><span class="num">3</span><span data-lang="tr">Veri ve kaynaklar</span><span data-lang="en">Data and sources</span></h2>
+    <h2><span class="num">4</span><span data-lang="tr">Veri ve kaynaklar</span><span data-lang="en">Data and sources</span></h2>
     <p data-lang="tr">TLREF'in yayımı 2019 başında başladığından seri 2 Ocak 2019'dan itibaren kullanılır. €STR'nin yayımı 1 Ekim 2019, TONA'nın bu veri setindeki ilk gözlemi 4 Ocak 2019 olduğundan EUR ve JPY pozisyonları bu tarihlerden açılır.</p>
     <p data-lang="en">TLREF publication began at the start of 2019, so the series is used from 2 January 2019. €STR publication starts on 1 October 2019 and the first TONA observation in this dataset is 4 January 2019, so EUR and JPY positions open from those dates.</p>
     <ul class="sources">
@@ -146,6 +157,6 @@
 </footer>
 
 <!--DATA-->
-<script src="assets/js/app.js?v=3"></script>
+<script src="assets/js/app.js?v=4"></script>
 </body>
 </html>
