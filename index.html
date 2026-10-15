@@ -110,8 +110,8 @@
         <p data-lang="en">On the opening day the investor borrows foreign currency, sells it at the CBRT buying rate and places the lira overnight at TLREF. The debt grows every night at the funding rate and the TL balance at TLREF. At the end of the holding period the TL balance is converted back at the selling rate and the accrued debt is repaid. What remains, relative to the principal borrowed, is the gross return.</p>
         <div class="formula">R = A(t₀) × [I_TL(t) ÷ I_TL(t₀)] ÷ S(t) − I_F(t) ÷ I_F(t₀)</div>
         <h3><span data-lang="tr">Gecelik faiz birikimi</span><span data-lang="en">Overnight accrual</span></h3>
-        <p data-lang="tr">Her referans faiz yayımlandığı günden bir sonraki yayım gününe kadar geçerlidir; hafta sonu ve tatillerde son oran takvim günü sayısı kadar işler. I, bu şekilde gecelik bileşiklenen birikim endeksidir. Gün sayımı TLREF, SONIA ve TONA için ACT/365, SOFR ve €STR için ACT/360'tır.</p>
-        <p data-lang="en">Each reference rate applies from its publication day until the next; over weekends and holidays the last rate accrues for the number of calendar days. I is the resulting overnight-compounded accrual index. Day count is ACT/365 for TLREF, SONIA and TONA and ACT/360 for SOFR and €STR.</p>
+        <p data-lang="tr">Her referans faiz ait olduğu işlem tarihinden bir sonraki işlem tarihine kadar geçerlidir; hafta sonu ve tatillerde son oran takvim günü sayısı kadar işler. SOFR, €STR, SONIA ve TONA ertesi iş günü yayımlandığından hesapta yayım tarihi değil, oranın ait olduğu işlem tarihi esas alınır. I, bu şekilde gecelik bileşiklenen birikim endeksidir. Gün sayımı TLREF, SONIA ve TONA için ACT/365, SOFR ve €STR için ACT/360'tır.</p>
+        <p data-lang="en">Each reference rate applies from the trade date it refers to until the next trade date; over weekends and holidays the last rate accrues for the number of calendar days. SOFR, €STR, SONIA and TONA are published on the following business day, so the calculation uses the trade date each rate refers to, not its publication date. I is the resulting overnight-compounded accrual index. Day count is ACT/365 for TLREF, SONIA and TONA and ACT/360 for SOFR and €STR.</p>
         <div class="formula">I(dᵢ₊₁) = I(dᵢ) × (1 + rᵢ × gün ÷ B)</div>
       </div>
       <div>
@@ -130,8 +130,8 @@
 
   <section class="block prose" id="veri">
     <h2><span class="num">4</span><span data-lang="tr">Veri ve kaynaklar</span><span data-lang="en">Data and sources</span></h2>
-    <p data-lang="tr">TLREF'in yayımı 2019 başında başladığından seri 2 Ocak 2019'dan itibaren kullanılır. €STR'nin yayımı 1 Ekim 2019, TONA'nın bu veri setindeki ilk gözlemi 4 Ocak 2019 olduğundan EUR ve JPY pozisyonları bu tarihlerden açılır.</p>
-    <p data-lang="en">TLREF publication began at the start of 2019, so the series is used from 2 January 2019. €STR publication starts on 1 October 2019 and the first TONA observation in this dataset is 4 January 2019, so EUR and JPY positions open from those dates.</p>
+    <p data-lang="tr">TLREF serisi 2 Ocak 2019 işlem tarihinden itibaren kullanılır. €STR'nin ilk işlem tarihi 1 Ekim 2019, TONA'nın bu veri setindeki ilk işlem tarihi 4 Ocak 2019 olduğundan EUR ve JPY pozisyonları bu tarihlerden açılır.</p>
+    <p data-lang="en">The TLREF series is used from trade date 2 January 2019. The first €STR trade date is 1 October 2019 and the first TONA trade date in this dataset is 4 January 2019, so EUR and JPY positions open from those dates.</p>
     <ul class="sources">
       <li data-lang="tr"><strong>TLREF:</strong> Borsa İstanbul, EVDS TP.BISTTLREF.ORAN (günlük).</li>
       <li data-lang="en"><strong>TLREF:</strong> Borsa İstanbul, EVDS TP.BISTTLREF.ORAN (daily).</li>
