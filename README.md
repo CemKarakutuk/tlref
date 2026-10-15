@@ -1,6 +1,6 @@
-# TLREF Carry Trade: Gross Returns on Overnight Funding
+# Global Unhedged TRY Carry Trade
 
-**Live site: [cemkarakutuk.github.io/tlrefcarry](https://cemkarakutuk.github.io/tlrefcarry/)** · Türkçe ve İngilizce · *Site is bilingual (TR/EN); use the language button in the top-right corner.*
+**Live site: [cemkarakutuk.github.io/tlref](https://cemkarakutuk.github.io/tlref/)** · Türkçe ve İngilizce · *Site is bilingual (TR/EN); use the language button in the top-right corner.*
 
 An interactive, open-data study of the classic carry trade into the Turkish lira: borrow overnight in **New York (SOFR)**, **Frankfurt (€STR)**, **London (SONIA)** or **Tokyo (TONA)**, convert into lira, and earn the lira overnight reference rate **TLREF**. Daily, from 2 January 2019 (€STR from 1 October 2019) to the present.
 
@@ -14,7 +14,7 @@ Below the chart, the calculation section takes an opening date (typed, or picked
 
 ## Method
 
-Each reference rate applies from its publication day until the next one, accruing for calendar days (SOFR Index logic):
+Each reference rate applies from the trade date it refers to until the next trade date, accruing for calendar days (SOFR Index logic). SOFR, €STR, SONIA and TONA are published on the following business day; the calculation uses the trade date, not the publication date:
 
 ```
 I(d_{i+1}) = I(d_i) · (1 + r_i · (d_{i+1} − d_i) / B)
